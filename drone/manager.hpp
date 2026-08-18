@@ -15,6 +15,7 @@
 #include <queue>
 #include "security.hpp"
 #include "drive.hpp"
+#include "config.h"
 
 // Liste des commandes que le drone peu recevoir
 namespace commands {
@@ -62,8 +63,8 @@ class manager {
 private:
     bool _isOK = false, _personalComputerIPKnowed = false, _appStart = false;
     char _packetBuffer[255]; // Tableau pour stocker le message entrant
-    const String DEFAULT_OUT_CMD = "INVALIDE_CMD";
 
+    const String DEFAULT_OUT_CMD = "INVALIDE_CMD";
     const int IN_COMMUNICATION = 14550;
     const int OUT_COMMUNICATION = 14551;
 

@@ -21,7 +21,11 @@ manager::~manager() {
 
 void manager::initProtocol() {
     Serial.println("Initialisation et autotest des composants...");
-    if (!_flyManager->powerOnSelfTest()) _isOK = true;
+    if (_flyManager->powerOnSelfTest()) {
+        Serial.println("L'un des composants present une erreur opérationnel.");
+        return;
+    }
+    _isOK = true;
     Serial.println("Tous les composants sont opérationnels.");
     return;
 }
@@ -74,13 +78,13 @@ void manager::startListening() {
     _appStart = true;
 
     xTaskCreatePinnedToCore(
-        manager::answerMannager,   // Function to implement the task
+        manager::answerMannager,  // Function to implement the task
         "answerMannager",         // Name of the task
-        4096,             // Stack size in words
-        this,             // Task input parameter
-        1,                // Priority of the task
-        &_multithread,     // Task handle to store the reference
-        0                 // Core ID (0 or 1)
+        4096,                     // Stack size in words
+        this,                     // Task input parameter
+        1,                        // Priority of the task
+        &_multithread,            // Task handle to store the reference
+        0                         // Core ID (0 or 1)
     );
     return;
 }
@@ -95,6 +99,9 @@ void manager::start() {
 
     // Attente d'instruction
     Serial.println("Lancement du Fly manager");
+
+    _flyManager->start();
+    _flyManager->hovering();
 
     for(;;) { 
         static paquet messageToTreat;
@@ -127,8 +134,12 @@ void manager::start() {
             //Serial.println("Out msg : payload ->" + (payload.isEmpty() ? messageToTreat.payload : payload) + ", pID -> " + messageToTreat.paquetID);
             sendData(payload + "\n" + messageToTreat.paquetID);
         }
+
         delay(20);
     }
+
+    delete _flyManager;
+    _flyManager = nullptr;
 }
 
 //* TODO
@@ -136,6 +147,10 @@ void manager::stop() {
     if (_multithread != NULL) {
         vTaskDelete(_multithread); 
         _multithread = NULL;
+    }
+    if (_flyManager != nullptr) {
+        delete _flyManager;
+        _flyManager = nullptr;
     }
     return;
 }

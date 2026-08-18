@@ -59,3 +59,14 @@ newgrp dialout
 - Communication PC Drone par Wifi (UDP)
 - Chiffrage de la communication par cléé symétrique
 - Anti bloquage pour le PC (via des threads)
+
+## TODO
+
+créer un fichier `config.h` :
+
+```cpp
+#pragma once
+
+const char* ssid  = "ssid";
+const char* password = "mot_de_passe";
+```
